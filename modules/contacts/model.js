@@ -17,7 +17,11 @@ const Contact = model(
       type: Boolean,
       default: false,
     },
+    owner: {
+      type: Schema.Types.ObjectId,
+      ref: "user",
+    },
   })
 );
 
-module.exports = Contact
+module.exports = Contact;

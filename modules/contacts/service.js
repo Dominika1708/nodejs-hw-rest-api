@@ -10,7 +10,7 @@ const exists = async (id) => Contact.exists({ _id: id });
 
 const remove = async (id) => Contact.findByIdAndRemove(id);
 
-const update = async (id, body) => Contact.findByIdAndUpdate(id, body);
+const update = async (id, body) => Contact.findByIdAndUpdate(id, body, {new: true});
 
 module.exports = {
   getAll,
