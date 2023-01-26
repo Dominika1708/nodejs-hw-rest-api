@@ -17,8 +17,21 @@ const schema = Joi.object({
   subscription: Joi.string().valid("starter", "pro", "business"),
 });
 
+const subscriptionSchema = Joi.object({
+  subscription: Joi.string().valid("starter", "pro", "business").required(),
+});
+
 const validateData = (req, res, next) => {
   const { error, value } = schema.validate(req.body);
+  if (error) {
+    return res.status(400).json({ message: error.message });
+  }
+  req.body = value;
+  next();
+};
+
+const validateSubscription = (req, res, next) => {
+  const { error, value } = subscriptionSchema.validate(req.body);
   if (error) {
     return res.status(400).json({ message: error.message });
   }
@@ -33,7 +46,7 @@ const params = {
 
 passport.use(
   new JwtStrategy(params, (payload, done) => {
-    User.findById(payload.id , (err, user) => {
+    User.findById(payload.id, (err, user) => {
       if (err) return done(err, false);
       if (user) return done(null, user);
       return done(null, false);
@@ -51,4 +64,4 @@ const auth = (req, res, next) => {
   })(req, res, next);
 };
 
-module.exports = { validateData, auth };
+module.exports = { validateData, validateSubscription, auth };

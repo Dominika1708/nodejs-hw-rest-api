@@ -67,9 +67,24 @@ const current = async (req, res, next) => {
     .json({ email: user.email, subscription: user.subscription });
 };
 
+const changeSubscription = async (req, res, next) => {
+  const user = await usersService.getById(req.user.id);
+  const { subscription } = req.body;
+
+  if (!user) {
+    return res.status(401).json({ message: "Not authorized" });
+  }
+
+  const updatedUser = await usersService.update(user.id, { subscription });
+  return res
+    .status(200)
+    .json({ email: updatedUser.email, subscription: updatedUser.subscription });
+};
+
 module.exports = {
   signup,
   login,
   logout,
   current,
+  changeSubscription,
 };
