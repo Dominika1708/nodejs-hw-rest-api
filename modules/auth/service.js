@@ -2,7 +2,7 @@ const User = require("./model");
 
 const create = async (body) => User.create(body);
 
-const getByEmail = async (email) => User.findOne(email);
+const getByEmail = async (email) => User.findOne({email});
 
 const update = async (id, body) => User.findByIdAndUpdate(id, body, { new: true });
 

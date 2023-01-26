@@ -38,17 +38,13 @@ passport.use(
       if (user) return done(null, user);
       return done(null, false);
     });
-    //   .then(([user]) => {
-    //     !user ? done(new Error("User not found")) : done(null, user);
-    //   })
-    //   .catch(done);
   })
 );
 
 const auth = (req, res, next) => {
   passport.authenticate("jwt", { session: false }, (error, user) => {
     if (!user || error) {
-      return res.status(401).json({ message: "Not authorized on auth" });
+      return res.status(401).json({ message: "Not authorized" });
     }
     req.user = user;
     next();

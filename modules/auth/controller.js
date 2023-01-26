@@ -24,7 +24,7 @@ const signup = async (req, res, next) => {
 
 const login = async (req, res, next) => {
   const { email, password } = req.body;
-  const user = await usersService.getByEmail({ email });
+  const user = await usersService.getByEmail(email);
 
   if (!user || !bcrypt.compareSync(password, user.password)) {
     return res.status(401).json({
@@ -33,7 +33,7 @@ const login = async (req, res, next) => {
   }
 
   const payload = {
-    id: user._id,
+    id: user.id,
     password: user.password,
     email,
     subscription: user.subscription,
@@ -49,13 +49,23 @@ const login = async (req, res, next) => {
 const logout = async (req, res, next) => {
   const user = await usersService.getById(req.user.id);
 
-  if (!user) return res.status(401).json({ message: "Not authorized on logout" });
-
-  usersService.update(user.id, { token: null });
-  return res.status(204);
+  if (!user) {
+    return res.status(401).json({ message: "Not authorized" });
+  }
+  const update = await usersService.update(user.id, { token: null });
+  return res.sendStatus(204);
 };
 
-const current = async (req, res, next) => {};
+const current = async (req, res, next) => {
+  const user = await usersService.getById(req.user.id);
+
+  if (!user) {
+    return res.status(401).json({ message: "Not authorized" });
+  }
+  return res
+    .status(200)
+    .json({ email: user.email, subscription: user.subscription });
+};
 
 module.exports = {
   signup,
