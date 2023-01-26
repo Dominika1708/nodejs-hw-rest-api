@@ -1,9 +1,17 @@
 const { isValidObjectId } = require("mongoose");
 const contactsService = require("./service");
 
-
 const listContacts = async (req, res, next) => {
-  const contacts = await contactsService.getAll();
+  let contacts = await contactsService.getAll();
+  const { page, limit, favorite } = req.query;
+
+  if (favorite) {
+    contacts = contacts.filter((contact) => contact.favorite.toString() === favorite);
+  }
+  if (page && limit) {
+    contacts = contacts.slice(limit * (page - 1), limit * page);
+  }
+
   return res.status(200).json(contacts);
 };
 
@@ -26,7 +34,9 @@ const getContactById = async (req, res, next) => {
 const addContact = async (req, res, next) => {
   const { name, email, phone } = req.body;
 
-  if (!name || !email || !phone) return res.status(400).json({ message: "missing required name field" });
+  if (!name || !email || !phone) {
+    return res.status(400).json({ message: "missing required name field" });
+  }
 
   const contact = await contactsService.create({ name, email, phone });
 
@@ -65,7 +75,9 @@ const updateContact = async (req, res, next) => {
   const exists = await contactsService.exists(id);
 
   if (!exists) return res.status(404).json({ message: "Not found" });
-  if (!name && !email && !phone) return res.status(400).json({ message: "missing fields" });
+  if (!name && !email && !phone) {
+    return res.status(400).json({ message: "missing fields" });
+  }
 
   const updatedContact = await contactsService.update(id, {
     name,
@@ -89,7 +101,9 @@ const updateStatusContact = async (req, res, next) => {
   const exists = await contactsService.exists(id);
 
   if (!exists) return res.status(404).json({ message: "Not found" });
-  if (!favorite) return res.status(400).json({ message: "missing field favorite" });
+  if (!favorite) {
+    return res.status(400).json({ message: "missing field favorite" });
+  }
 
   const updatedContact = await contactsService.update(id, { favorite });
   return res.status(200).json({ updatedContact });
