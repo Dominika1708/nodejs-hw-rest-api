@@ -32,14 +32,7 @@ const login = async (req, res, next) => {
     });
   }
 
-  const payload = {
-    id: user.id,
-    password: user.password,
-    email,
-    subscription: user.subscription,
-  };
-
-  const token = jwt.sign(payload, secretKey, { expiresIn: "1h" });
+  const token = jwt.sign({id: user.id}, secretKey, { expiresIn: "1h" });
   const userWithToken = await usersService.update(user._id, { token });
   return res
     .status(200)
