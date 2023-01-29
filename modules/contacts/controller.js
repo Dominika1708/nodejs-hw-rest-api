@@ -4,13 +4,16 @@ const contactsService = require("./service");
 const listContacts = async (req, res, next) => {
   const contacts = await contactsService.getAll();
   const { page, limit, favorite } = req.query;
-  let filteredContacts = contacts;
+  let filteredContacts = [];
 
   if (favorite) {
-    filteredContacts = contacts.filter(({favorite: fav}) => String(fav) === favorite);
+    filteredContacts = contacts.filter(({ favorite: fav }) => fav === Boolean(favorite));
   }
   if (page && limit) {
     filteredContacts = contacts.slice(limit * (page - 1), limit * page);
+  }
+  if (!page && !limit && !favorite) {
+    filteredContacts = [...contacts];
   }
 
   return res.status(200).json(filteredContacts);
