@@ -1,16 +1,16 @@
 const User = require("./model");
 
-const create = async (body) => User.create(body);
+const getById = async (id) => User.findById(id);
 
 const getByEmail = async (email) => User.findOne({email});
 
-const update = async (id, body) => User.findByIdAndUpdate(id, body, { new: true });
+const create = async (body) => User.create(body);
 
-const getById = async (id) => User.findById(id);
+const update = async (id, body) =>  User.findByIdAndUpdate(id, body, { new: true });
 
 module.exports = {
-    create,
-    getByEmail,
-    update,
-    getById
-}
+  getById,
+  getByEmail,
+  create,
+  update,
+};

@@ -2,17 +2,18 @@ const { isValidObjectId } = require("mongoose");
 const contactsService = require("./service");
 
 const listContacts = async (req, res, next) => {
-  let contacts = await contactsService.getAll();
+  const contacts = await contactsService.getAll();
   const { page, limit, favorite } = req.query;
+  let filteredContacts = contacts;
 
   if (favorite) {
-    contacts = contacts.filter((contact) => contact.favorite.toString() === favorite);
+    filteredContacts = contacts.filter(({favorite: fav}) => String(fav) === favorite);
   }
   if (page && limit) {
-    contacts = contacts.slice(limit * (page - 1), limit * page);
+    filteredContacts = contacts.slice(limit * (page - 1), limit * page);
   }
 
-  return res.status(200).json(contacts);
+  return res.status(200).json(filteredContacts);
 };
 
 const getContactById = async (req, res, next) => {
