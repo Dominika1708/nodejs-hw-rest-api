@@ -3,6 +3,8 @@ const passport = require("passport");
 const User = require("./model");
 const JwtStrategy = require("passport-jwt").Strategy;
 const ExtractJwt = require("passport-jwt").ExtractJwt;
+const path = require("path");
+const multer = require("multer");
 require("dotenv").config();
 
 const secret = process.env.JTW_SECRET;
@@ -64,4 +66,20 @@ const auth = (req, res, next) => {
   })(req, res, next);
 };
 
-module.exports = { validateData, validateSubscription, auth };
+const uploadDir = path.join(process.cwd(), "tmp");
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.originalname);
+  },
+  limits: {
+    fileSize: 1048576,
+  },
+});
+
+const upload = multer({ storage });
+
+module.exports = { validateData, validateSubscription, auth, upload };
