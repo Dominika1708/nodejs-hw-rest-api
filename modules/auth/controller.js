@@ -97,7 +97,7 @@ const updateAvatar = async (req, res, next) => {
 
   try {
     const file = await Jimp.read(temporaryName);
-    file.resize(250, 250).write(fileName);
+    file.resize(250, 250).write(temporaryName);
   } catch (err) {
     console.error({ message: err });
   }
