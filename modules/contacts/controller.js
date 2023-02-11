@@ -12,7 +12,7 @@ const listContacts = async (req, res, next) => {
   if (page && limit) {
     filteredContacts = contacts.slice(limit * (page - 1), limit * page);
   }
-  if (!page && !limit && !favorite) {
+  if (!(page || limit  || favorite)) {
     filteredContacts = [...contacts];
   }
 
@@ -38,7 +38,7 @@ const getContactById = async (req, res, next) => {
 const addContact = async (req, res, next) => {
   const { name, email, phone } = req.body;
 
-  if (!name || !email || !phone) {
+  if (!(name || email || phone)) {
     return res.status(400).json({ message: "missing required name field" });
   }
 
@@ -79,7 +79,7 @@ const updateContact = async (req, res, next) => {
   const exists = await contactsService.exists(id);
 
   if (!exists) return res.status(404).json({ message: "Not found" });
-  if (!name && !email && !phone) {
+  if (!(name && email && phone)) {
     return res.status(400).json({ message: "missing fields" });
   }
 
