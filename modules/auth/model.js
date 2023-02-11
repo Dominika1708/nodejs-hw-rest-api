@@ -21,6 +21,7 @@ const User = model(
       type: String,
       default: null,
     },
+    avatarURL: String,
     verify: {
       type: Boolean,
       default: false,

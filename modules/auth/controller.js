@@ -1,5 +1,9 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const gravatar = require("gravatar");
+const path = require("path");
+const fs = require("fs").promises;
+const Jimp = require("jimp");
 const { v4: uuidv4 } = require("uuid");
 const sgMail = require("@sendgrid/mail");
 const usersService = require("./service");
@@ -13,11 +17,13 @@ const signup = async (req, res, next) => {
     const { password, email } = req.body;
     const salt = bcrypt.genSaltSync(10);
     const hash = bcrypt.hashSync(password, salt);
+    const avatarURL = gravatar.url(email);
     const verificationToken = uuidv4();
 
     const user = await usersService.create({
       password: hash,
       email,
+      avatarURL,
       verificationToken,
     });
 
@@ -157,12 +163,46 @@ const verificationBackup = async (req, res, next) => {
   return res.status(200).json({ message: "Verification email sent" });
 };
 
+const storeImage = path.join(process.cwd(), "public", "avatars");
+
+const updateAvatar = async (req, res, next) => {
+  const user = await usersService.getById(req.user.id);
+
+  if (!user) {
+    return res.status(401).json({ message: "Not authorized" });
+  }
+
+  const { path: temporaryName, originalname } = req.file;
+  const fileName = path.join(storeImage, user.id + originalname);
+
+  try {
+    const file = await Jimp.read(temporaryName);
+    file.resize(250, 250).write(temporaryName);
+  } catch (err) {
+    console.error({ message: err });
+  }
+
+  try {
+    await fs.rename(temporaryName, fileName);
+  } catch (err) {
+    await fs.unlink(temporaryName);
+    return next(err);
+  }
+
+  const updatedUser = await usersService.update(user.id, {
+    avatarURL: `/avatars/${user.id + originalname}`,
+  });
+
+  return res.status(200).json({ avatarURL: updatedUser.avatarURL });
+};
+
 module.exports = {
   signup,
   login,
   logout,
   current,
   changeSubscription,
+  updateAvatar,
   verifyUser,
   verificationBackup,
 };
