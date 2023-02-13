@@ -4,10 +4,13 @@ const gravatar = require("gravatar");
 const path = require("path");
 const fs = require("fs").promises;
 const Jimp = require("jimp");
+const { v4: uuidv4 } = require("uuid");
+const sgMail = require("@sendgrid/mail");
 const usersService = require("./service");
 require("dotenv").config();
 
 const secretKey = process.env.JTW_SECRET;
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const signup = async (req, res, next) => {
   try {
@@ -15,12 +18,32 @@ const signup = async (req, res, next) => {
     const salt = bcrypt.genSaltSync(10);
     const hash = bcrypt.hashSync(password, salt);
     const avatarURL = gravatar.url(email);
+    const verificationToken = uuidv4();
 
     const user = await usersService.create({
       password: hash,
       email,
       avatarURL,
+      verificationToken,
     });
+
+    const msg = {
+      to: email,
+      from: "domi.sosnowska@o2.pl",
+      subject: "Verify email",
+      text: `To verify email copy the following link and open in browser: http://localhost:3000/api/users/verify/${verificationToken}`,
+      html: `<p>Verify email by clicking <a href="http://localhost:3000/api/users/verify/${verificationToken}">here</a></p>`,
+    };
+
+    sgMail
+      .send(msg)
+      .then(() => {
+        console.log("Email sent");
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+
     return res
       .status(201)
       .json({ user: { email: user.email, subscription: user.subscription } });
@@ -33,11 +56,17 @@ const signup = async (req, res, next) => {
 
 const login = async (req, res, next) => {
   const { email, password } = req.body;
-  const user = await usersService.getByEmail(email);
+  const user = await usersService.getByKey({ email });
 
-  if (!user || !bcrypt.compareSync(password, user.password)) {
+  if (!(user && bcrypt.compareSync(password, user.password))) {
     return res.status(401).json({
       message: "Email or password is wrong",
+    });
+  }
+
+  if (!user.verify) {
+    return res.status(401).json({
+      message: "Verify email to log in",
     });
   }
 
@@ -83,6 +112,57 @@ const changeSubscription = async (req, res, next) => {
     .json({ email: updatedUser.email, subscription: updatedUser.subscription });
 };
 
+const verifyUser = async (req, res, next) => {
+  const verificationToken = req.params.verificationToken;
+  const user = await usersService.getByKey({ verificationToken });
+
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  await usersService.update(user.id, { verificationToken: null, verify: true });
+
+  return res.status(200).json({
+    message: "Verification successful",
+  });
+};
+
+const verificationBackup = async (req, res, next) => {
+  const { email } = req.body;
+  if (!email) {
+    return res.status(400).json({ message: "missing required field email" });
+  }
+
+  const user = await usersService.getByKey({ email });
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+  if (user.verify) {
+    return res
+      .status(400)
+      .json({ message: "Verification has already been passed" });
+  }
+
+  const msg = {
+    to: email,
+    from: "domi.sosnowska@o2.pl",
+    subject: "Verify email",
+    text: `To verify email copy the following link and open in browser: http://localhost:3000/api/users/verify/${user.verificationToken}`,
+    html: `<p>Verify email by clicking <a href="http://localhost:3000/api/users/verify/${user.verificationToken}">here</a></p>`,
+  };
+
+  sgMail
+    .send(msg)
+    .then(() => {
+      console.log("Email sent");
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+
+  return res.status(200).json({ message: "Verification email sent" });
+};
+
 const storeImage = path.join(process.cwd(), "public", "avatars");
 
 const updateAvatar = async (req, res, next) => {
@@ -123,4 +203,6 @@ module.exports = {
   current,
   changeSubscription,
   updateAvatar,
+  verifyUser,
+  verificationBackup,
 };

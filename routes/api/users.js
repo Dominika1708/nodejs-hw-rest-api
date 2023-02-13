@@ -5,13 +5,17 @@ const { validateData, auth, validateSubscription, upload } = require("../../modu
 
 const router = express.Router();
 
+router.get("/current", auth, usersController.current);
+
+router.get("/logout", auth, usersController.logout);
+
+router.get("/verify/:verificationToken", usersController.verifyUser);
+
 router.post("/signup", validateData, usersController.signup);
 
 router.post("/login", validateData, usersController.login);
 
-router.get("/logout", auth, usersController.logout);
-
-router.get("/current", auth, usersController.current);
+router.post("/verify", usersController.verificationBackup)
 
 router.patch("/", validateSubscription, auth, usersController.changeSubscription);
 
