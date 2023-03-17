@@ -8,7 +8,7 @@ require("dotenv").config();
 
 const secret = process.env.JTW_SECRET;
 
-const validateData = schema => (req, res, next) => {
+const validateData = (schema) => (req, res, next) => {
   const { error, value } = schema.validate(req.body);
   if (error) {
     return res.status(400).json({ message: error.message });
@@ -36,6 +36,9 @@ const auth = (req, res, next) => {
   passport.authenticate("jwt", { session: false }, (error, user) => {
     if (!user || error) {
       return res.status(401).json({ message: "Not authorized" });
+    }
+    if (!user.verify) {
+      return res.status(401).json({ message: "User not verified" });
     }
     req.user = user;
     next();
