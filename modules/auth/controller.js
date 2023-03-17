@@ -18,7 +18,7 @@ const signup = async (req, res, next) => {
     const salt = bcrypt.genSaltSync(10);
     const hash = bcrypt.hashSync(password, salt);
     const avatarURL = gravatar.url(email);
-    const verificationToken = uuidv4();
+    const verificationToken = uuidv4().slice(0,7);
 
     const user = await usersService.create({
       password: hash,
@@ -32,8 +32,8 @@ const signup = async (req, res, next) => {
       to: email,
       from: "domi.sosnowska@o2.pl",
       subject: "Verify email",
-      text: `To verify email copy the following link and open in browser: https://willowy-crumble-d3eb49.netlify.app/.netlify/functions/app/user/verify/${verificationToken}`,
-      html: `<p>Verify email by clicking <a href="https://willowy-crumble-d3eb49.netlify.app/.netlify/functions/app/user/verify/${verificationToken}">here</a></p>`,
+      text: `Your verification code is: ${verificationToken}`,
+      html: `<p>Your verification code is: <b>${verificationToken}</b></p>`,
     };
 
     await sgMail
@@ -150,8 +150,8 @@ const verificationBackup = async (req, res, next) => {
     to: email,
     from: "domi.sosnowska@o2.pl",
     subject: "Verify email",
-    text: `To verify email copy the following link and open in browser: https://willowy-crumble-d3eb49.netlify.app/.netlify/functions/app/user/verify/${user.verificationToken}`,
-    html: `<p>Verify email by clicking <a href="https://willowy-crumble-d3eb49.netlify.app/.netlify/functions/app/user/verify/${user.verificationToken}">here</a></p>`,
+    text: `Your verification code is: ${user.verificationToken}`,
+    html: `<p>Your verification code is: <b>${user.verificationToken}</b></p>`,
   };
 
   await sgMail

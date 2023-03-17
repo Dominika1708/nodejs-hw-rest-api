@@ -1,4 +1,3 @@
-const Joi = require("joi");
 const passport = require("passport");
 const User = require("./model");
 const JwtStrategy = require("passport-jwt").Strategy;
@@ -9,49 +8,8 @@ require("dotenv").config();
 
 const secret = process.env.JTW_SECRET;
 
-const signupSchema = Joi.object({
-  password: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")).required(),
-  email: Joi.string()
-    .email({
-      minDomainSegments: 2,
-    })
-    .required(),
-  name: Joi.string().required()
-});
-
-const loginSchema = Joi.object({
-  password: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")).required(),
-  email: Joi.string()
-    .email({
-      minDomainSegments: 2,
-    })
-    .required()
-});
-
-const subscriptionSchema = Joi.object({
-  subscription: Joi.string().valid("starter", "pro", "business").required(),
-});
-
-const validateSignup = (req, res, next) => {
-  const { error, value } = signupSchema.validate(req.body);
-  if (error) {
-    return res.status(400).json({ message: error.message });
-  }
-  req.body = value;
-  next();
-};
-
-const validateLogin = (req, res, next) => {
-  const { error, value } = loginSchema.validate(req.body);
-  if (error) {
-    return res.status(400).json({ message: error.message });
-  }
-  req.body = value;
-  next();
-};
-
-const validateSubscription = (req, res, next) => {
-  const { error, value } = subscriptionSchema.validate(req.body);
+const validateData = schema => (req, res, next) => {
+  const { error, value } = schema.validate(req.body);
   if (error) {
     return res.status(400).json({ message: error.message });
   }
@@ -100,4 +58,4 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-module.exports = { validateSignup, validateLogin, validateSubscription, auth, upload };
+module.exports = { validateData, auth, upload };
