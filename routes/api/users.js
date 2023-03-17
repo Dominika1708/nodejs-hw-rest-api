@@ -7,13 +7,13 @@ const router = express.Router();
 
 router.get("/current", auth, usersController.current);
 
-router.get("/logout", auth, usersController.logout);
-
 router.get("/verify/:verificationToken", usersController.verifyUser);
 
 router.post("/signup", validateSignup, usersController.signup);
 
 router.post("/login", validateLogin, usersController.login);
+
+router.post("/logout", auth, usersController.logout);
 
 router.post("/verify", usersController.verificationBackup)
 

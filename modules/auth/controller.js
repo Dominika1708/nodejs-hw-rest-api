@@ -32,17 +32,19 @@ const signup = async (req, res, next) => {
       to: email,
       from: "domi.sosnowska@o2.pl",
       subject: "Verify email",
-      text: `To verify email copy the following link and open in browser: http://localhost:3000/api/users/verify/${verificationToken}`,
-      html: `<p>Verify email by clicking <a href="http://localhost:3000/api/users/verify/${verificationToken}">here</a></p>`,
+      text: `To verify email copy the following link and open in browser: https://willowy-crumble-d3eb49.netlify.app/.netlify/functions/app/user/verify/${verificationToken}`,
+      html: `<p>Verify email by clicking <a href="https://willowy-crumble-d3eb49.netlify.app/.netlify/functions/app/user/verify/${verificationToken}">here</a></p>`,
     };
 
-    sgMail
+    await sgMail
       .send(msg)
       .then(() => {
         console.log("Email sent");
       })
       .catch((error) => {
-        console.error(error);
+        return res.status(404).json({
+          message: error,
+        });
       });
 
     return res
@@ -84,7 +86,7 @@ const logout = async (req, res, next) => {
   if (!user) {
     return res.status(401).json({ message: "Not authorized" });
   }
-  const update = await usersService.update(user.id, { token: null });
+  await usersService.update(user.id, { token: null });
   return res.sendStatus(204);
 };
 
@@ -148,17 +150,19 @@ const verificationBackup = async (req, res, next) => {
     to: email,
     from: "domi.sosnowska@o2.pl",
     subject: "Verify email",
-    text: `To verify email copy the following link and open in browser: http://localhost:3000/api/users/verify/${user.verificationToken}`,
-    html: `<p>Verify email by clicking <a href="http://localhost:3000/api/users/verify/${user.verificationToken}">here</a></p>`,
+    text: `To verify email copy the following link and open in browser: https://willowy-crumble-d3eb49.netlify.app/.netlify/functions/app/user/verify/${user.verificationToken}`,
+    html: `<p>Verify email by clicking <a href="https://willowy-crumble-d3eb49.netlify.app/.netlify/functions/app/user/verify/${user.verificationToken}">here</a></p>`,
   };
 
-  sgMail
+  await sgMail
     .send(msg)
     .then(() => {
       console.log("Email sent");
     })
     .catch((error) => {
-      console.error(error);
+      return res.status(404).json({
+        message: error,
+      });
     });
 
   return res.status(200).json({ message: "Verification email sent" });

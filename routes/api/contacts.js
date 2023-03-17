@@ -11,9 +11,9 @@ router.get("/:contactId", contactsController.getContactById);
 
 router.post("/", validateData, contactsController.addContact);
 
-router.delete("/:contactId", contactsController.removeContact);
-
 router.put("/:contactId", validateData, contactsController.updateContact);
+
+router.delete("/:contactId", contactsController.removeContact);
 
 router.patch("/:contactId/favorite", validateData, contactsController.updateStatusContact)
 
