@@ -14,7 +14,7 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const signup = async (req, res, next) => {
   try {
-    const { password, email } = req.body;
+    const { password, email, name } = req.body;
     const salt = bcrypt.genSaltSync(10);
     const hash = bcrypt.hashSync(password, salt);
     const avatarURL = gravatar.url(email);
@@ -23,6 +23,7 @@ const signup = async (req, res, next) => {
     const user = await usersService.create({
       password: hash,
       email,
+      name,
       avatarURL,
       verificationToken,
     });

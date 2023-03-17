@@ -1,7 +1,7 @@
 const express = require("express");
 
 const usersController = require("../../modules/auth/controller");
-const { validateData, auth, validateSubscription, upload } = require("../../modules/auth/middleware");
+const { validateSignup, validateLogin, auth, validateSubscription, upload } = require("../../modules/auth/middleware");
 
 const router = express.Router();
 
@@ -11,9 +11,9 @@ router.get("/logout", auth, usersController.logout);
 
 router.get("/verify/:verificationToken", usersController.verifyUser);
 
-router.post("/signup", validateData, usersController.signup);
+router.post("/signup", validateSignup, usersController.signup);
 
-router.post("/login", validateData, usersController.login);
+router.post("/login", validateLogin, usersController.login);
 
 router.post("/verify", usersController.verificationBackup)
 

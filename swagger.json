@@ -1,0 +1,483 @@
+{
+  "openapi" : "3.0.0",
+  "servers" : [ {
+    "description" : "Phonebook backend url",
+    "url" : "https://willowy-crumble-d3eb49.netlify.app/.netlify/functions/app"
+  } ],
+  "info" : {
+    "description" : "API documentation for project 'Phonebook'. [Backend github repository](https://github.com/Dominika1708/nodejs-hw-rest-api)",
+    "version" : "1.0.0",
+    "title" : "The Phonebook API",
+    "license" : {
+      "name" : "Apache 2.0",
+      "url" : "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "tags" : [ {
+    "name" : "user",
+    "description" : "User related endpoints"
+  }, {
+    "name" : "contact",
+    "description" : "Contacts endpoints"
+  } ],
+  "paths" : {
+    "/user/signup" : {
+      "post" : {
+        "tags" : [ "user" ],
+        "summary" : "User registration",
+        "responses" : {
+          "201" : {
+            "description" : "User created",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/RegistrationLoginResponse"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad request (invalid request body)"
+          },
+          "409" : {
+            "description" : "Provided email is already in use"
+          }
+        },
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/RegistrationLoginRequest"
+              }
+            }
+          },
+          "required" : true,
+          "description" : "Registration's object"
+        }
+      }
+    },
+    "/user/login" : {
+      "post" : {
+        "tags" : [ "user" ],
+        "summary" : "User authentication",
+        "responses" : {
+          "200" : {
+            "description" : "Successful login",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/RegistrationLoginResponse"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad request (invalid request body)"
+          },
+          "401" : {
+            "description" : "Email or password is wrong"
+          }
+        },
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/RegistrationLoginRequest"
+              }
+            }
+          },
+          "required" : true,
+          "description" : "Authentication's object"
+        }
+      }
+    },
+    "/user/logout" : {
+      "post" : {
+        "tags" : [ "user" ],
+        "summary" : "Logout",
+        "security" : [ {
+          "Bearer" : [ ]
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "Successful logout"
+          },
+          "401" : {
+            "description" : "Not authorized"
+          }
+        }
+      }
+    },
+    "/contact" : {
+      "get" : {
+        "tags" : [ "contact" ],
+        "summary" : "Get all user's contacts",
+        "security" : [ {
+          "Bearer" : [ ]
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AllcontactsResponse"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Not authorized"
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "contact" ],
+        "summary" : "Create contact",
+        "security" : [ {
+          "Bearer" : [ ]
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/contactResponse"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad request (invalid request body)"
+          },
+          "401" : {
+            "description" : "Not authorized"
+          }
+        },
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/contactRequest"
+              }
+            }
+          },
+          "required" : true,
+          "description" : "contact's object"
+        }
+      }
+    },
+    "/contact/{contactId}" : {
+      "put" : {
+        "tags" : [ "contact" ],
+        "summary" : "Edit contact",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "contactId",
+          "schema" : {
+            "type" : "string"
+          },
+          "required" : true
+        } ],
+        "security" : [ {
+          "Bearer" : [ ]
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/contactResponse"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad request (invalid request body or contactId)"
+          },
+          "401" : {
+            "description" : "Not authorized"
+          }
+        },
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/contactRequest"
+              }
+            }
+          },
+          "required" : true,
+          "description" : "contact's object"
+        }
+      },
+      "delete" : {
+        "tags" : [ "contact" ],
+        "summary" : "Delete contact",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "contactId",
+          "schema" : {
+            "type" : "string"
+          },
+          "required" : true
+        } ],
+        "security" : [ {
+          "Bearer" : [ ]
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "Successful operation"
+          },
+          "400" : {
+            "description" : "Bad request (invalid contactId)"
+          },
+          "401" : {
+            "description" : "Not authorized"
+          }
+        }
+      }
+    },
+    "/contact/{contactId}/favorite" : {
+      "patch" : {
+        "tags" : [ "contact" ],
+        "summary" : "Toggle contact's status",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "contactId",
+          "schema" : {
+            "type" : "string"
+          },
+          "required" : true
+        } ],
+        "security" : [ {
+          "Bearer" : [ ]
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/contactResponse"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad request (invalid contactId)"
+          },
+          "401" : {
+            "description" : "Not authorized"
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "RegistrationLoginRequest" : {
+        "type" : "object",
+        "required" : [ "email", "password" ],
+        "properties" : {
+          "email" : {
+            "type" : "string",
+            "format" : "email",
+            "description" : "User's email",
+            "example" : "example@mail.com"
+          },
+          "password" : {
+            "type" : "string",
+            "description" : "User's password",
+            "example" : "qwerty123"
+          }
+        }
+      },
+      "RegistrationLoginResponse" : {
+        "type" : "object",
+        "properties" : {
+          "accessToken" : {
+            "type" : "string",
+            "description" : "JSON Web Tokens",
+            "example" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzZWZjNThjNmVjMTkxODcwNGM3NzhmMyIsImlhdCI6MTY3NjczNTE2MCwiZXhwIjoxNjc2NzM4NzYwfQ.kTwMPAjmX_VrWtFomKlA9FCZngjc4sA2_Ke9WjsIrEg"
+          },
+          "userData" : {
+            "type" : "object",
+            "properties" : {
+              "email" : {
+                "type" : "string",
+                "format" : "email",
+                "description" : "User's email",
+                "example" : "example@mail.com"
+              },
+              "id" : {
+                "type" : "string",
+                "description" : "User's id",
+                "example" : "63efc58c6ec1918704c778f3"
+              }
+            }
+          }
+        }
+      },
+      "AllcontactsResponse" : {
+        "type" : "object",
+        "properties" : {
+          "contacts" : {
+            "type" : "array",
+            "items" : {
+              "type" : "object",
+              "description" : "User's contacts",
+              "properties" : {
+                "id" : {
+                  "type" : "string",
+                  "description" : "contact's id",
+                  "example" : "63efc58c6ec1918704c778f3"
+                },
+                "title" : {
+                  "type" : "string",
+                  "description" : "contact title",
+                  "example" : "Take out the trash"
+                },
+                "difficulty" : {
+                  "type" : "string",
+                  "description" : "contact difficulty",
+                  "example" : "easy"
+                },
+                "date" : {
+                  "type" : "string",
+                  "description" : "contact date",
+                  "example" : "2023-12-31"
+                },
+                "time" : {
+                  "type" : "string",
+                  "description" : "contact time",
+                  "example" : "12:30"
+                },
+                "status" : {
+                  "type" : "string",
+                  "description" : "contact status",
+                  "example" : "incomplete"
+                },
+                "category" : {
+                  "type" : "string",
+                  "description" : "contact category",
+                  "example" : "stuff"
+                },
+                "type" : {
+                  "type" : "string",
+                  "description" : "contact type",
+                  "example" : "task"
+                },
+                "owner" : {
+                  "type" : "string",
+                  "description" : "contact's owner id",
+                  "example" : "63f3b596d8e875a8a97b935e"
+                }
+              }
+            }
+          }
+        }
+      },
+      "contactRequest" : {
+        "type" : "object",
+        "required" : [ "title", "difficulty", "date", "time", "category", "type" ],
+        "properties" : {
+          "title" : {
+            "type" : "string",
+            "description" : "contact title",
+            "example" : "Take out the trash"
+          },
+          "difficulty" : {
+            "type" : "string",
+            "description" : "contact difficulty",
+            "example" : "easy"
+          },
+          "date" : {
+            "type" : "string",
+            "description" : "contact date",
+            "example" : "2023-12-31"
+          },
+          "time" : {
+            "type" : "string",
+            "description" : "contact time",
+            "example" : "12:30"
+          },
+          "category" : {
+            "type" : "string",
+            "description" : "contact category",
+            "example" : "stuff"
+          },
+          "type" : {
+            "type" : "string",
+            "description" : "contact type",
+            "example" : "task"
+          }
+        }
+      },
+      "contactResponse" : {
+        "type" : "object",
+        "properties" : {
+          "contact" : {
+            "type" : "object",
+            "properties" : {
+              "id" : {
+                "type" : "string",
+                "description" : "contact's id",
+                "example" : "63efc58c6ec1918704c778f3"
+              },
+              "title" : {
+                "type" : "string",
+                "description" : "contact title",
+                "example" : "Take out the trash"
+              },
+              "difficulty" : {
+                "type" : "string",
+                "description" : "contact difficulty",
+                "example" : "easy"
+              },
+              "date" : {
+                "type" : "string",
+                "description" : "contact date",
+                "example" : "2023-12-31"
+              },
+              "time" : {
+                "type" : "string",
+                "description" : "contact time",
+                "example" : "12:30"
+              },
+              "status" : {
+                "type" : "string",
+                "description" : "contact status",
+                "example" : "incomplete"
+              },
+              "category" : {
+                "type" : "string",
+                "description" : "contact category",
+                "example" : "stuff"
+              },
+              "type" : {
+                "type" : "string",
+                "description" : "contact type",
+                "example" : "task"
+              },
+              "owner" : {
+                "type" : "string",
+                "description" : "contact's owner id",
+                "example" : "63f3b596d8e875a8a97b935e"
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "Bearer" : {
+        "type" : "http",
+        "scheme" : "bearer",
+        "bearerFormat" : "JWT"
+      }
+    }
+  }
+}
