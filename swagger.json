@@ -1,482 +1,835 @@
 {
-  "openapi" : "3.0.0",
-  "servers" : [ {
-    "description" : "Phonebook backend url",
-    "url" : "https://willowy-crumble-d3eb49.netlify.app/.netlify/functions/app"
-  } ],
-  "info" : {
-    "description" : "API documentation for project 'Phonebook'. [Backend github repository](https://github.com/Dominika1708/nodejs-hw-rest-api)",
-    "version" : "1.0.0",
-    "title" : "The Phonebook API",
-    "license" : {
-      "name" : "Apache 2.0",
-      "url" : "http://www.apache.org/licenses/LICENSE-2.0.html"
+  "openapi": "3.0.0",
+  "servers": [
+    {
+      "description": "Phonebook backend url",
+      "url": "https://willowy-crumble-d3eb49.netlify.app/.netlify/functions/app"
+    }
+  ],
+  "info": {
+    "description": "API documentation for project 'Phonebook'. [Backend github repository](https://github.com/Dominika1708/nodejs-hw-rest-api)",
+    "version": "1.0.0",
+    "title": "The Phonebook API",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
     }
   },
-  "tags" : [ {
-    "name" : "user",
-    "description" : "User related endpoints"
-  }, {
-    "name" : "contact",
-    "description" : "Contacts endpoints"
-  } ],
-  "paths" : {
-    "/user/signup" : {
-      "post" : {
-        "tags" : [ "user" ],
-        "summary" : "User registration",
-        "responses" : {
-          "201" : {
-            "description" : "User created",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/RegistrationLoginResponse"
+  "tags": [
+    {
+      "name": "user",
+      "description": "User related endpoints"
+    },
+    {
+      "name": "contact",
+      "description": "Contact endpoints"
+    }
+  ],
+  "paths": {
+    "/user/current": {
+      "get": {
+        "tags": ["user"],
+        "summary": "Get user's data",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentResponse"
                 }
               }
             }
           },
-          "400" : {
-            "description" : "Bad request (invalid request body)"
+          "401": {
+            "description": "Not authorized"
+          }
+        }
+      }
+    },
+    "/user/signup": {
+      "post": {
+        "tags": ["user"],
+        "summary": "User registration",
+        "responses": {
+          "201": {
+            "description": "User created and email with verification code sent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistrationResponse"
+                }
+              }
+            }
           },
-          "409" : {
-            "description" : "Provided email is already in use"
+          "400": {
+            "description": "Bad request (invalid request body)"
+          },
+          "409": {
+            "description": "Provided email is already in use"
           }
         },
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/RegistrationLoginRequest"
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistrationRequest"
               }
             }
           },
-          "required" : true,
-          "description" : "Registration's object"
+          "required": true,
+          "description": "Registration's object"
         }
       }
     },
-    "/user/login" : {
-      "post" : {
-        "tags" : [ "user" ],
-        "summary" : "User authentication",
-        "responses" : {
-          "200" : {
-            "description" : "Successful login",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/RegistrationLoginResponse"
+    "/user/login": {
+      "post": {
+        "tags": ["user"],
+        "summary": "User authentication",
+        "responses": {
+          "200": {
+            "description": "Successful login",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
                 }
               }
             }
           },
-          "400" : {
-            "description" : "Bad request (invalid request body)"
+          "400": {
+            "description": "Bad request (invalid request body)"
           },
-          "401" : {
-            "description" : "Email or password is wrong"
+          "401": {
+            "description": "Email or password is wrong or user not verified"
           }
         },
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/RegistrationLoginRequest"
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
               }
             }
           },
-          "required" : true,
-          "description" : "Authentication's object"
+          "required": true,
+          "description": "Authentication's object"
         }
       }
     },
-    "/user/logout" : {
-      "post" : {
-        "tags" : [ "user" ],
-        "summary" : "Logout",
-        "security" : [ {
-          "Bearer" : [ ]
-        } ],
-        "responses" : {
-          "204" : {
-            "description" : "Successful logout"
+    "/user/logout": {
+      "post": {
+        "tags": ["user"],
+        "summary": "Logout",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful logout"
           },
-          "401" : {
-            "description" : "Not authorized"
+          "401": {
+            "description": "Not authorized"
           }
         }
       }
     },
-    "/contact" : {
-      "get" : {
-        "tags" : [ "contact" ],
-        "summary" : "Get all user's contacts",
-        "security" : [ {
-          "Bearer" : [ ]
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "Successful operation",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/AllcontactsResponse"
+    "/user/verify": {
+      "post": {
+        "tags": ["user"],
+        "summary": "Send email with verification code",
+        "responses": {
+          "200": {
+            "description": "Verification email sent"
+          },
+          "400": {
+            "description": "Bad request (invalid request body) or Verification has already been passed"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyRequest"
+              }
+            }
+          },
+          "required": true,
+          "description": "Email to verify"
+        }
+      }
+    },
+    "/user/verify/{verificationId}": {
+      "patch": {
+        "tags": ["user"],
+        "summary": "Verify user",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "verificationId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Verification successful"
+          },
+          "400": {
+            "description": "Bad request (invalid verificationId)"
+          }
+        }
+      }
+    },
+    "/user": {
+      "patch": {
+        "tags": ["user"],
+        "summary": "Change user's subscription",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistrationResponse"
                 }
               }
             }
           },
-          "401" : {
-            "description" : "Not authorized"
+          "400": {
+            "description": "Bad request (invalid request body)"
+          },
+          "401": {
+            "description": "Not authorized"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionRequest"
+              }
+            }
+          },
+          "required": true,
+          "description": "Change subscription ( \"starter\" || \"pro\" || \"business\" )"
+        }
+      }
+    },
+    "/user/avatar": {
+      "patch": {
+        "tags": ["user"],
+        "summary": "Change user's avatar",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AvatarResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (invalid request body)"
+          },
+          "401": {
+            "description": "Not authorized"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "image": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          },
+          "required": true,
+          "description": "Upload avatar file"
+        }
+      }
+    },
+    "/contact": {
+      "get": {
+        "tags": ["contact"],
+        "summary": "Get all user's contacts",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "favorite",
+            "schema": {
+              "type": "boolean",
+              "enum": [true]
+            },
+            "description": "Get only favorite contacts"
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The number of the page to return"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The number of contacts to return per page"
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AllcontactsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authorized"
           }
         }
       },
-      "post" : {
-        "tags" : [ "contact" ],
-        "summary" : "Create contact",
-        "security" : [ {
-          "Bearer" : [ ]
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "Successful operation",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/contactResponse"
+      "post": {
+        "tags": ["contact"],
+        "summary": "Add contact",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactResponse"
                 }
               }
             }
           },
-          "400" : {
-            "description" : "Bad request (invalid request body)"
+          "400": {
+            "description": "Bad request (invalid request body)"
           },
-          "401" : {
-            "description" : "Not authorized"
+          "401": {
+            "description": "Not authorized"
           }
         },
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/contactRequest"
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactRequest"
               }
             }
           },
-          "required" : true,
-          "description" : "contact's object"
+          "required": true,
+          "description": "contact's data"
         }
       }
     },
-    "/contact/{contactId}" : {
-      "put" : {
-        "tags" : [ "contact" ],
-        "summary" : "Edit contact",
-        "parameters" : [ {
-          "in" : "path",
-          "name" : "contactId",
-          "schema" : {
-            "type" : "string"
-          },
-          "required" : true
-        } ],
-        "security" : [ {
-          "Bearer" : [ ]
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "Successful operation",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/contactResponse"
+    "/contact/{contactId}": {
+      "get": {
+        "tags": ["contact"],
+        "summary": "Get contact",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "contactId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactResponse"
                 }
               }
             }
           },
-          "400" : {
-            "description" : "Bad request (invalid request body or contactId)"
+          "400": {
+            "description": "Bad request (invalid contactId)"
           },
-          "401" : {
-            "description" : "Not authorized"
+          "401": {
+            "description": "Not authorized"
+          },
+          "404": {
+            "description": "Contact not found"
           }
-        },
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/contactRequest"
-              }
-            }
-          },
-          "required" : true,
-          "description" : "contact's object"
         }
       },
-      "delete" : {
-        "tags" : [ "contact" ],
-        "summary" : "Delete contact",
-        "parameters" : [ {
-          "in" : "path",
-          "name" : "contactId",
-          "schema" : {
-            "type" : "string"
-          },
-          "required" : true
-        } ],
-        "security" : [ {
-          "Bearer" : [ ]
-        } ],
-        "responses" : {
-          "204" : {
-            "description" : "Successful operation"
-          },
-          "400" : {
-            "description" : "Bad request (invalid contactId)"
-          },
-          "401" : {
-            "description" : "Not authorized"
+      "put": {
+        "tags": ["contact"],
+        "summary": "Edit contact",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "contactId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
           }
-        }
-      }
-    },
-    "/contact/{contactId}/favorite" : {
-      "patch" : {
-        "tags" : [ "contact" ],
-        "summary" : "Toggle contact's status",
-        "parameters" : [ {
-          "in" : "path",
-          "name" : "contactId",
-          "schema" : {
-            "type" : "string"
-          },
-          "required" : true
-        } ],
-        "security" : [ {
-          "Bearer" : [ ]
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "Successful operation",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/contactResponse"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactResponse"
                 }
               }
             }
           },
-          "400" : {
-            "description" : "Bad request (invalid contactId)"
+          "400": {
+            "description": "Bad request (invalid request body or contactId)"
           },
-          "401" : {
-            "description" : "Not authorized"
+          "401": {
+            "description": "Not authorized"
+          },
+          "404": {
+            "description": "Contact not found"
           }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactRequest"
+              }
+            }
+          },
+          "required": true,
+          "description": "contact data"
+        }
+      },
+      "delete": {
+        "tags": ["contact"],
+        "summary": "Delete contact",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "contactId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Contact deleted"
+          },
+          "400": {
+            "description": "Bad request (invalid contactId)"
+          },
+          "401": {
+            "description": "Not authorized"
+          },
+          "404": {
+            "description": "Contact not found"
+          }
+        }
+      }
+    },
+    "/contact/{contactId}/favorite": {
+      "patch": {
+        "tags": ["contact"],
+        "summary": "Toggle contact's favorite status",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "contactId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (invalid request body or contactId)"
+          },
+          "401": {
+            "description": "Not authorized"
+          },
+          "404": {
+            "description": "Contact not found"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FavoriteRequest"
+              }
+            }
+          },
+          "required": true,
+          "description": "favorite option"
         }
       }
     }
   },
-  "components" : {
-    "schemas" : {
-      "RegistrationLoginRequest" : {
-        "type" : "object",
-        "required" : [ "email", "password" ],
-        "properties" : {
-          "email" : {
-            "type" : "string",
-            "format" : "email",
-            "description" : "User's email",
-            "example" : "example@mail.com"
-          },
-          "password" : {
-            "type" : "string",
-            "description" : "User's password",
-            "example" : "qwerty123"
-          }
-        }
-      },
-      "RegistrationLoginResponse" : {
-        "type" : "object",
-        "properties" : {
-          "accessToken" : {
-            "type" : "string",
-            "description" : "JSON Web Tokens",
-            "example" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzZWZjNThjNmVjMTkxODcwNGM3NzhmMyIsImlhdCI6MTY3NjczNTE2MCwiZXhwIjoxNjc2NzM4NzYwfQ.kTwMPAjmX_VrWtFomKlA9FCZngjc4sA2_Ke9WjsIrEg"
-          },
-          "userData" : {
-            "type" : "object",
-            "properties" : {
-              "email" : {
-                "type" : "string",
-                "format" : "email",
-                "description" : "User's email",
-                "example" : "example@mail.com"
+  "components": {
+    "schemas": {
+      "CurrentResponse": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "type": "object",
+            "properties": {
+              "email": {
+                "type": "string",
+                "format": "email",
+                "description": "User's email",
+                "example": "example@mail.com"
               },
-              "id" : {
-                "type" : "string",
-                "description" : "User's id",
-                "example" : "63efc58c6ec1918704c778f3"
+              "name": {
+                "type": "string",
+                "description": "User's name",
+                "example": "John Smith"
+              },
+              "subscription": {
+                "type": "string",
+                "description": "User's subscription",
+                "example": "starter"
+              },
+              "avatarURL": {
+                "type": "string",
+                "description": "User's avatar",
+                "example": "//www.gravatar.com/avatar/37b7c092b60738ed18485aa7be0052ad"
               }
             }
           }
         }
       },
-      "AllcontactsResponse" : {
-        "type" : "object",
-        "properties" : {
-          "contacts" : {
-            "type" : "array",
-            "items" : {
-              "type" : "object",
-              "description" : "User's contacts",
-              "properties" : {
-                "id" : {
-                  "type" : "string",
-                  "description" : "contact's id",
-                  "example" : "63efc58c6ec1918704c778f3"
+      "RegistrationRequest": {
+        "type": "object",
+        "required": ["name", "email", "password"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "User's name",
+            "example": "John Smith"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "User's email",
+            "example": "example@mail.com"
+          },
+          "password": {
+            "type": "string",
+            "description": "User's password",
+            "example": "qwerty123"
+          }
+        }
+      },
+      "RegistrationResponse": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "type": "object",
+            "properties": {
+              "email": {
+                "type": "string",
+                "format": "email",
+                "description": "User's email",
+                "example": "example@mail.com"
+              },
+              "subscription": {
+                "type": "string",
+                "description": "User's subscription",
+                "example": "starter"
+              }
+            }
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "User's email",
+            "example": "example@mail.com"
+          },
+          "password": {
+            "type": "string",
+            "description": "User's password",
+            "example": "qwerty123"
+          }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "JSON Web Tokens",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzZWZjNThjNmVjMTkxODcwNGM3NzhmMyIsImlhdCI6MTY3NjczNTE2MCwiZXhwIjoxNjc2NzM4NzYwfQ.kTwMPAjmX_VrWtFomKlA9FCZngjc4sA2_Ke9WjsIrEg"
+          },
+          "user": {
+            "type": "object",
+            "properties": {
+              "email": {
+                "type": "string",
+                "format": "email",
+                "description": "User's email",
+                "example": "example@mail.com"
+              },
+              "name": {
+                "type": "string",
+                "description": "User's name",
+                "example": "John Smith"
+              },
+              "subscription": {
+                "type": "string",
+                "description": "User's subscription",
+                "example": "starter"
+              },
+              "avatarURL": {
+                "type": "string",
+                "description": "User's avatar",
+                "example": "//www.gravatar.com/avatar/37b7c092b60738ed18485aa7be0052ad"
+              }
+            }
+          }
+        }
+      },
+      "VerifyRequest": {
+        "type": "object",
+        "required": ["email"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "User's email",
+            "example": "example@mail.com"
+          }
+        }
+      },
+      "SubscriptionRequest": {
+        "type": "object",
+        "required": ["subscription"],
+        "properties": {
+          "subscription": {
+            "type": "string",
+            "enum": ["starter", "pro", "business"],
+            "description": "User's subscription",
+            "example": "starter"
+          }
+        }
+      },
+      "AvatarResponse": {
+        "type": "object",
+        "properties": {
+          "avatarURL": {
+            "type": "string",
+            "description": "User's avatar",
+            "example": "//www.gravatar.com/avatar/37b7c092b60738ed18485aa7be0052ad"
+          }
+        }
+      },
+      "AllcontactsResponse": {
+        "type": "object",
+        "properties": {
+          "contacts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "User's contacts",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "contact's id",
+                  "example": "63efc58c6ec1918704c778f3"
                 },
-                "title" : {
-                  "type" : "string",
-                  "description" : "contact title",
-                  "example" : "Take out the trash"
+                "name": {
+                  "type": "string",
+                  "description": "contact name",
+                  "example": "Sara Smith"
                 },
-                "difficulty" : {
-                  "type" : "string",
-                  "description" : "contact difficulty",
-                  "example" : "easy"
+                "email": {
+                  "type": "string",
+                  "description": "contact email",
+                  "example": "example@mail.com"
                 },
-                "date" : {
-                  "type" : "string",
-                  "description" : "contact date",
-                  "example" : "2023-12-31"
+                "phone": {
+                  "type": "string",
+                  "description": "contact phone number",
+                  "example": "124 985 345"
                 },
-                "time" : {
-                  "type" : "string",
-                  "description" : "contact time",
-                  "example" : "12:30"
+                "favorite": {
+                  "type": "boolean",
+                  "description": "contact status",
+                  "example": true
                 },
-                "status" : {
-                  "type" : "string",
-                  "description" : "contact status",
-                  "example" : "incomplete"
-                },
-                "category" : {
-                  "type" : "string",
-                  "description" : "contact category",
-                  "example" : "stuff"
-                },
-                "type" : {
-                  "type" : "string",
-                  "description" : "contact type",
-                  "example" : "task"
-                },
-                "owner" : {
-                  "type" : "string",
-                  "description" : "contact's owner id",
-                  "example" : "63f3b596d8e875a8a97b935e"
+                "owner": {
+                  "type": "string",
+                  "description": "contact's owner id",
+                  "example": "63f3b596d8e875a8a97b935e"
                 }
               }
             }
           }
         }
       },
-      "contactRequest" : {
-        "type" : "object",
-        "required" : [ "title", "difficulty", "date", "time", "category", "type" ],
-        "properties" : {
-          "title" : {
-            "type" : "string",
-            "description" : "contact title",
-            "example" : "Take out the trash"
+      "ContactRequest": {
+        "type": "object",
+        "required": ["name", "phone"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "contact name",
+            "example": "Sara Smith"
           },
-          "difficulty" : {
-            "type" : "string",
-            "description" : "contact difficulty",
-            "example" : "easy"
+          "email": {
+            "type": "string",
+            "description": "contact email",
+            "example": "example@mail.com"
           },
-          "date" : {
-            "type" : "string",
-            "description" : "contact date",
-            "example" : "2023-12-31"
-          },
-          "time" : {
-            "type" : "string",
-            "description" : "contact time",
-            "example" : "12:30"
-          },
-          "category" : {
-            "type" : "string",
-            "description" : "contact category",
-            "example" : "stuff"
-          },
-          "type" : {
-            "type" : "string",
-            "description" : "contact type",
-            "example" : "task"
+          "phone": {
+            "type": "string",
+            "description": "contact phone number",
+            "example": "124 985 345"
           }
         }
       },
-      "contactResponse" : {
-        "type" : "object",
-        "properties" : {
-          "contact" : {
-            "type" : "object",
-            "properties" : {
-              "id" : {
-                "type" : "string",
-                "description" : "contact's id",
-                "example" : "63efc58c6ec1918704c778f3"
+      "ContactResponse": {
+        "type": "object",
+        "properties": {
+          "contact": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "contact's id",
+                "example": "63efc58c6ec1918704c778f3"
               },
-              "title" : {
-                "type" : "string",
-                "description" : "contact title",
-                "example" : "Take out the trash"
+              "name": {
+                "type": "string",
+                "description": "contact name",
+                "example": "Sara Smith"
               },
-              "difficulty" : {
-                "type" : "string",
-                "description" : "contact difficulty",
-                "example" : "easy"
+              "email": {
+                "type": "string",
+                "description": "contact email",
+                "example": "example@mail.com"
               },
-              "date" : {
-                "type" : "string",
-                "description" : "contact date",
-                "example" : "2023-12-31"
+              "phone": {
+                "type": "string",
+                "description": "contact phone number",
+                "example": "124 985 345"
               },
-              "time" : {
-                "type" : "string",
-                "description" : "contact time",
-                "example" : "12:30"
+              "favorite": {
+                "type": "boolean",
+                "description": "contact status",
+                "example": true
               },
-              "status" : {
-                "type" : "string",
-                "description" : "contact status",
-                "example" : "incomplete"
-              },
-              "category" : {
-                "type" : "string",
-                "description" : "contact category",
-                "example" : "stuff"
-              },
-              "type" : {
-                "type" : "string",
-                "description" : "contact type",
-                "example" : "task"
-              },
-              "owner" : {
-                "type" : "string",
-                "description" : "contact's owner id",
-                "example" : "63f3b596d8e875a8a97b935e"
+              "owner": {
+                "type": "string",
+                "description": "contact's owner id",
+                "example": "63f3b596d8e875a8a97b935e"
               }
             }
           }
         }
+      },
+      "FavoriteRequest": {
+        "type": "object",
+        "required": ["favorite"],
+        "properties": {
+          "favorite": {
+            "type": "boolean",
+            "description": "is contact a favorite",
+            "example": true
+          }
+        }
       }
     },
-    "securitySchemes" : {
-      "Bearer" : {
-        "type" : "http",
-        "scheme" : "bearer",
-        "bearerFormat" : "JWT"
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       }
     }
   }

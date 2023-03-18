@@ -8,18 +8,32 @@ const router = express.Router();
 
 router.get("/current", auth, usersController.current);
 
-router.get("/verify/:verificationToken", usersController.verifyUser);
-
 router.post("/signup", validateData(schema.signup), usersController.signup);
 
 router.post("/login", validateData(schema.login), usersController.login);
 
 router.post("/logout", auth, usersController.logout);
 
-router.post("/verify", validateData(schema.verify), usersController.verificationBackup)
+router.post(
+  "/verify",
+  validateData(schema.verify),
+  usersController.verificationBackup
+);
 
-router.patch("/", validateData(schema.subscription), auth, usersController.changeSubscription);
+router.patch("/verify/:verificationToken", usersController.verifyUser);
 
-router.patch("/avatars", auth, upload.single('avatar'), usersController.updateAvatar)
+router.patch(
+  "/",
+  validateData(schema.subscription),
+  auth,
+  usersController.changeSubscription
+);
+
+router.patch(
+  "/avatar",
+  auth,
+  upload.single("avatar"),
+  usersController.updateAvatar
+);
 
 module.exports = router;

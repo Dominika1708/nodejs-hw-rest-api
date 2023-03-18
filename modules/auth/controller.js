@@ -18,7 +18,7 @@ const signup = async (req, res, next) => {
     const salt = bcrypt.genSaltSync(10);
     const hash = bcrypt.hashSync(password, salt);
     const avatarURL = gravatar.url(email);
-    const verificationToken = uuidv4().slice(0,7);
+    const verificationToken = uuidv4().slice(0, 7);
 
     const user = await usersService.create({
       password: hash,
@@ -75,9 +75,15 @@ const login = async (req, res, next) => {
 
   const token = jwt.sign({ id: user.id }, secretKey, { expiresIn: "1h" });
   const userWithToken = await usersService.update(user._id, { token });
-  return res
-    .status(200)
-    .json({ token, user: { email, subscription: userWithToken.subscription } });
+  return res.status(200).json({
+    token,
+    user: {
+      email,
+      name: userWithToken.name,
+      subscription: userWithToken.subscription,
+      avatarURL: userWithToken.avatarURL,
+    },
+  });
 };
 
 const logout = async (req, res, next) => {
@@ -96,9 +102,14 @@ const current = async (req, res, next) => {
   if (!user) {
     return res.status(401).json({ message: "Not authorized" });
   }
-  return res
-    .status(200)
-    .json({ email: user.email, subscription: user.subscription });
+  return res.status(200).json({
+    user: {
+      email: user.email,
+      name: user.name,
+      subscription: user.subscription,
+      avatarURL: user.avatarURL,
+    },
+  });
 };
 
 const changeSubscription = async (req, res, next) => {
@@ -112,7 +123,12 @@ const changeSubscription = async (req, res, next) => {
   const updatedUser = await usersService.update(user.id, { subscription });
   return res
     .status(200)
-    .json({ email: updatedUser.email, subscription: updatedUser.subscription });
+    .json({
+      user: {
+        email: updatedUser.email,
+        subscription: updatedUser.subscription,
+      },
+    });
 };
 
 const verifyUser = async (req, res, next) => {
@@ -184,7 +200,7 @@ const updateAvatar = async (req, res, next) => {
     const file = await Jimp.read(temporaryName);
     file.resize(250, 250).write(temporaryName);
   } catch (err) {
-    console.error({ message: err });
+    return res.status(400).json({ message: err });
   }
 
   try {
