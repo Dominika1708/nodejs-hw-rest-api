@@ -33,7 +33,7 @@ const getContactById = async (req, res, next) => {
 
   const contact = await contactsService.getById(id);
   
-  if (contact.owner !== req.user.id) {
+  if (contact.owner != req.user.id) {
     return res.status(401).json({ message: "Not authorized" });
   }
 
@@ -69,7 +69,7 @@ const removeContact = async (req, res, next) => {
 
   if (!contact) return res.status(404).json({ message: "Not found" });
 
-  if (contact.owner !== req.user.id) {
+  if (contact.owner != req.user.id) {
     return res.status(401).json({ message: "Not authorized" });
   }
 
@@ -96,7 +96,7 @@ const updateContact = async (req, res, next) => {
 
   if (!contact) return res.status(404).json({ message: "Not found" });
 
-  if (contact.owner !== req.user.id) {
+  if (contact.owner != req.user.id) {
     return res.status(401).json({ message: "Not authorized" });
   }
 
@@ -127,7 +127,7 @@ const updateStatusContact = async (req, res, next) => {
 
   if (!contact) return res.status(404).json({ message: "Not found" });
 
-  if (contact.owner !== req.user.id) {
+  if (contact.owner != req.user.id) {
     return res.status(401).json({ message: "Not authorized" });
   }
 
