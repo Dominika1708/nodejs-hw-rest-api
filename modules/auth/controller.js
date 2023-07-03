@@ -18,14 +18,14 @@ const signup = async (req, res, next) => {
     const salt = bcrypt.genSaltSync(10);
     const hash = bcrypt.hashSync(password, salt);
     const avatarURL = gravatar.url(email);
-    // const verificationToken = uuidv4().slice(0, 7);
+    const verificationToken = uuidv4().slice(0, 7);
 
     const user = await usersService.create({
       password: hash,
       email,
       name,
       avatarURL,
-      // verificationToken,
+      verificationToken,
     });
 
     // const msg = {
@@ -59,9 +59,9 @@ const signup = async (req, res, next) => {
         avatarURL: userWithToken.avatarURL,
       },
     });
-  } catch {
+  } catch (err) {
     return res.status(409).json({
-      message: "Email in use",
+      message: "Email in use"
     });
   }
 };
