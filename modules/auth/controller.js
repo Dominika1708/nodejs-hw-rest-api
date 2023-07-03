@@ -47,9 +47,18 @@ const signup = async (req, res, next) => {
     //     });
     //   });
 
-    return res
-      .status(201)
-      .json({ user: { email: user.email, subscription: user.subscription } });
+    const token = jwt.sign({ id: user.id }, secretKey, { expiresIn: "1h" });
+    const userWithToken = await usersService.update(user._id, { token });
+
+    return res.status(201).json({
+      token,
+      user: {
+        email,
+        name: userWithToken.name,
+        subscription: userWithToken.subscription,
+        avatarURL: userWithToken.avatarURL,
+      },
+    });
   } catch {
     return res.status(409).json({
       message: "Email in use",
@@ -121,14 +130,12 @@ const changeSubscription = async (req, res, next) => {
   }
 
   const updatedUser = await usersService.update(user.id, { subscription });
-  return res
-    .status(200)
-    .json({
-      user: {
-        email: updatedUser.email,
-        subscription: updatedUser.subscription,
-      },
-    });
+  return res.status(200).json({
+    user: {
+      email: updatedUser.email,
+      subscription: updatedUser.subscription,
+    },
+  });
 };
 
 const verifyUser = async (req, res, next) => {
