@@ -37,9 +37,9 @@ const auth = (req, res, next) => {
     if (!user || error) {
       return res.status(401).json({ message: "Not authorized" });
     }
-    if (!user.verify) {
-      return res.status(401).json({ message: "User not verified" });
-    }
+    // if (!user.verify) {
+    //   return res.status(401).json({ message: "User not verified" });
+    // }
     req.user = user;
     next();
   })(req, res, next);

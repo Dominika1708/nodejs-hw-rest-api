@@ -18,34 +18,34 @@ const signup = async (req, res, next) => {
     const salt = bcrypt.genSaltSync(10);
     const hash = bcrypt.hashSync(password, salt);
     const avatarURL = gravatar.url(email);
-    const verificationToken = uuidv4().slice(0, 7);
+    // const verificationToken = uuidv4().slice(0, 7);
 
     const user = await usersService.create({
       password: hash,
       email,
       name,
       avatarURL,
-      verificationToken,
+      // verificationToken,
     });
 
-    const msg = {
-      to: email,
-      from: "domi.sosnowska@o2.pl",
-      subject: "Verify email",
-      text: `Your verification code is: ${verificationToken}`,
-      html: `<p>Your verification code is: <b>${verificationToken}</b></p>`,
-    };
+    // const msg = {
+    //   to: email,
+    //   from: "domi.sosnowska@o2.pl",
+    //   subject: "Verify email",
+    //   text: `Your verification code is: ${verificationToken}`,
+    //   html: `<p>Your verification code is: <b>${verificationToken}</b></p>`,
+    // };
 
-    await sgMail
-      .send(msg)
-      .then(() => {
-        console.log("Email sent");
-      })
-      .catch((error) => {
-        return res.status(404).json({
-          message: error,
-        });
-      });
+    // await sgMail
+    //   .send(msg)
+    //   .then(() => {
+    //     console.log("Email sent");
+    //   })
+    //   .catch((error) => {
+    //     return res.status(404).json({
+    //       message: error,
+    //     });
+    //   });
 
     return res
       .status(201)
@@ -67,11 +67,11 @@ const login = async (req, res, next) => {
     });
   }
 
-  if (!user.verify) {
-    return res.status(401).json({
-      message: "Verify email to log in",
-    });
-  }
+  // if (!user.verify) {
+  //   return res.status(401).json({
+  //     message: "Verify email to log in",
+  //   });
+  // }
 
   const token = jwt.sign({ id: user.id }, secretKey, { expiresIn: "1h" });
   const userWithToken = await usersService.update(user._id, { token });
